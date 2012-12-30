@@ -108,15 +108,21 @@ class BlueToothClient(object):
         self.client_socket.connect((bt_address, self.port))
         print "Connected."
 
+    def close_connection(self):
+        """
+        Closes client socket.
+        """
+        print "\nClosing connection..."
+        self.client_socket.close()
+        print "\nClosed."
+
     def send_data(self, data):
         """
-        Sends given data and closes socket.
+        Sends given data.
         """
         print "\nSending..."
         self.client_socket.send(data)
-
-        print "\nDone. Closing connection."
-        self.client_socket.close()
+        print "\nDone."
 
 
 class UserMenu(object):
@@ -155,29 +161,34 @@ class UserMenu(object):
         print " (3) Send vibration pattern three"
         print " (4) Send vibration pattern four"
         print " (5) Send text data"
-        print " (0) Back to the connection menu"
+        print " (0) Close connection and back to main menu"
 
     def process_command_menu_input(self, user_input):
         """
         Processes given user commands for data transfer/vibrating patterns.
         """
         if user_input is "0":
-            pass
+            self.BTClient.close_connection()
 
         elif user_input is "1":
             self.BTClient.send_data("hvc0#_16fd2706")  # pattern 1 code
+            self.BTClient.close_connection()
 
         elif user_input is "2":
             self.BTClient.send_data("hvc0#_6fa459ea")  # pattern 2 code
+            self.BTClient.close_connection()
 
         elif user_input is "3":
             self.BTClient.send_data("hvc0#_a8098c1a")  # pattern 3 code
+            self.BTClient.close_connection()
 
         elif user_input is "4":
             self.BTClient.send_data("hvc0#_886313e1")  # pattern 4 code
+            self.BTClient.close_connection()
 
         elif user_input is "5":
             self.BTClient.send_data(raw_input("\nPlease input text to send: "))
+            self.BTClient.close_connection()
 
     def process_conn_menu_input(self, user_input):
         """
