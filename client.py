@@ -6,18 +6,21 @@ import sys
 import bluetooth
 
 
+PORT = 0x1001
+DISCOVERY_DURATION = 8
+
+
 class BlueToothClient(object):
     """
     A class representing bluetooth connectivity and data transfer.
     """
-    def __init__(self, port=0x1001):
+    def __init__(self):
         self.client_socket = bluetooth.BluetoothSocket(bluetooth.L2CAP)
-        self.port = port
 
         self.nearby_devices = None
         self.bt_services = None
 
-    def discover_devices(self, discovery_duration=8):
+    def discover_devices(self):
         """
         Discover visible devices within the given time limit.
         1 duration unit equals to 1.28 seconds.
@@ -27,7 +30,7 @@ class BlueToothClient(object):
         print "\nDiscovering all nearby BlueTooth devices...\n"
         self.nearby_devices = None
         self.nearby_devices = bluetooth.discover_devices(
-                                                   duration=discovery_duration,
+                                                   duration=DISCOVERY_DURATION,
                                                    flush_cache=True,
                                                    lookup_names=True)
         if self.nearby_devices:
@@ -100,12 +103,11 @@ class BlueToothClient(object):
 
     def connect_to_device(self, bt_address):
         """
-        Connects to a device with a given BT address and port
-        specified during BlueToothClient Class creation.
+        Connects to a device with a given BT address and global PORT.
         """
         print "Connecting to a device with address %s \
-        on port %s ..." % (bt_address, self.port)
-        self.client_socket.connect((bt_address, self.port))
+        on port %s ..." % (bt_address, PORT)
+        self.client_socket.connect((bt_address, PORT))
         print "Connected."
 
     def close_connection(self):
