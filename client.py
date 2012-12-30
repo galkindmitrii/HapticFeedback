@@ -22,7 +22,7 @@ class BlueToothClient(object):
 
     def discover_devices(self):
         """
-        Discover visible devices within the given time limit.
+        Discover visible devices within the DISCOVERY_DURATION time limit.
         1 duration unit equals to 1.28 seconds.
         Setting less than 8 units is not recommended due to possible
         devices undetection.
@@ -40,7 +40,7 @@ class BlueToothClient(object):
 
     def nearby_devices_to_dict(self):
         """
-        Represents discovered BT devices as a dictionary:
+        Returns discovered BT devices as a dictionary:
         {Number_of_device: (address, name),}
         """
         if self.nearby_devices:
@@ -129,7 +129,7 @@ class BlueToothClient(object):
 
 class UserMenu(object):
     """
-    A class representing interracton with user.
+    A class representing interracton with a user.
     """
     def __init__(self):
         self.BTClient = BlueToothClient()
