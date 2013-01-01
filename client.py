@@ -3,11 +3,15 @@
 import os
 import sys
 
+import ConfigParser
 import bluetooth
 
 
-PORT = 0x1001
-DISCOVERY_DURATION = 8
+config = ConfigParser.ConfigParser()
+config.read('clientconfig.cfg')
+
+PORT = int(config.get('BT_client_settings', 'port', 0), 16)
+DISCOVERY_DURATION = config.getint('BT_client_settings', 'discovery_duration')
 
 
 class BlueToothClient(object):
@@ -207,11 +211,11 @@ class UserMenu(object):
                 print nearby_devices
 
                 bt_address_name = nearby_devices[int(raw_input("\nPlease input"
-                " target device number: "))]
+                                                   " target device number: "))]
                 self.BTClient.connect_to_device(bt_address_name[0])
                 self.show_command_menu()
                 self.process_command_menu_input(raw_input('\nPlease '
-                'select option: '))
+                                                          'select option: '))
             else:
                 print "No recently discovered nearby devices."
 
