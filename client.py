@@ -7,11 +7,26 @@ import ConfigParser
 import bluetooth
 
 
-config = ConfigParser.ConfigParser()
-config.read('clientconfig.cfg')
+try:
+    os.system('cls' if os.name == 'nt' else 'clear')  # clear screen
 
-PORT = int(config.get('BT_client_settings', 'port', 0), 16)
-DISCOVERY_DURATION = config.getint('BT_client_settings', 'discovery_duration')
+    # reading bluetooth connection settings from file
+    config_filename = 'clientconfig.cfg'
+    config_section_name = 'BT_client_settings'
+
+    config = ConfigParser.ConfigParser()
+    config.read(config_filename)
+
+    PORT = int(config.get(config_section_name, 'port', 0), 16)
+    DISCOVERY_DURATION = config.getint(config_section_name,
+                                       'discovery_duration')
+    FLUSH_CACHE = config.getboolean(config_section_name, 'flush_cache')
+except ConfigParser.NoSectionError:
+    print "\nWarning: Failed to find section '%s' in configuration file '%s', \
+using default settings." % (config_section_name, config_filename)
+    PORT = 0x1001
+    DISCOVERY_DURATION = 8
+    FLUSH_CACHE = True
 
 
 class BlueToothClient(object):
@@ -35,7 +50,7 @@ class BlueToothClient(object):
         self.nearby_devices = None
         self.nearby_devices = bluetooth.discover_devices(
                                                    duration=DISCOVERY_DURATION,
-                                                   flush_cache=True,
+                                                   flush_cache=FLUSH_CACHE,
                                                    lookup_names=True)
         if self.nearby_devices:
             print "Found %d device(-s)" % len(self.nearby_devices)
@@ -109,10 +124,9 @@ class BlueToothClient(object):
         """
         Connects to a device with a given BT address and global PORT.
         """
-        print "Connecting to a device with address %s \
-        on port %s ..." % (bt_address, PORT)
+        print "Connecting to a device with \
+address %s on port %s ..." % (bt_address, PORT)
         self.client_socket.connect((bt_address, PORT))
-        print "Connected."
 
     def close_connection(self):
         """
@@ -225,7 +239,7 @@ class UserMenu(object):
             self.BTClient.connect_to_device(bt_address)
             self.show_command_menu()
             self.process_command_menu_input(raw_input('\nPlease '
-            'select option: '))
+                                                            'select option: '))
 
     def process_main_menu_input(self, user_input):
         """
@@ -255,6 +269,5 @@ class UserMenu(object):
 
 
 if __name__ == '__main__':
-    os.system('cls' if os.name == 'nt' else 'clear')  # clear screen
     Menu = UserMenu()
     Menu.start()
