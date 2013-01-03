@@ -2,15 +2,16 @@
 """
 import os
 import sys
-
+import logging
 import ConfigParser
+
 import bluetooth
 
 
 try:
     os.system('cls' if os.name == 'nt' else 'clear')  # clear screen
 
-    # reading bluetooth connection settings from file
+    # reading bluetooth client settings from file
     config_filename = 'clientconfig.cfg'
     config_section_name = 'BT_client_settings'
 
@@ -21,12 +22,20 @@ try:
     DISCOVERY_DURATION = config.getint(config_section_name,
                                        'discovery_duration')
     FLUSH_CACHE = config.getboolean(config_section_name, 'flush_cache')
+    LOG_FILE = config.get(config_section_name, 'log_file')
+
 except ConfigParser.NoSectionError:
-    print "\nWarning: Failed to find section '%s' in configuration file '%s', \
-using default settings." % (config_section_name, config_filename)
+    print "\nWarning: Failed to find section '%s' in/or configuration \
+file '%s', using default settings." % (config_section_name, config_filename)
     PORT = 0x1001
     DISCOVERY_DURATION = 8
     FLUSH_CACHE = True
+    LOG_FILE = 'client.log'
+
+LOG = logging
+LOG.basicConfig(filename=LOG_FILE,
+                level=logging.DEBUG,
+                format='%(asctime)s - %(levelname)s - %(message)s')
 
 
 class BlueToothClient(object):
@@ -88,9 +97,11 @@ class BlueToothClient(object):
         """
         if bluetooth.is_valid_address(address):
             print "Address %s is valid." % address
+            LOG.debug("Checking address. Address %s is valid." % address)
             return True
         else:
             print "Address %s is not valid." % address
+            LOG.warning("Checking address. Address %s is NOT valid." % address)
             #TODO: Write own exception here
             raise Exception("Bad address")
 
@@ -127,6 +138,8 @@ class BlueToothClient(object):
         print "Connecting to a device with \
 address %s on port %s ..." % (bt_address, PORT)
         self.client_socket.connect((bt_address, PORT))
+        LOG.debug('Connected to a device with \
+address %s on port %s.' % (bt_address, PORT))
 
     def close_connection(self):
         """
@@ -135,6 +148,7 @@ address %s on port %s ..." % (bt_address, PORT)
         print "\nClosing connection..."
         self.client_socket.close()
         print "\nClosed."
+        LOG.debug('Current connection was closed.')
 
     def send_data(self, data):
         """
@@ -263,6 +277,7 @@ class UserMenu(object):
         """
         Start interracting with user.
         """
+        LOG.info('Haptics Feedback Client application started.')
         while True:
             self.show_main_menu()
             self.process_main_menu_input(raw_input('\nPlease select option: '))
