@@ -43,10 +43,14 @@ class BlueToothClient(object):
     A class representing bluetooth connectivity and data transfer.
     """
     def __init__(self):
-        self.client_socket = bluetooth.BluetoothSocket(bluetooth.L2CAP)
-
         self.nearby_devices = None
         self.bt_services = None
+
+    def create_bt_socket(self):
+        """
+        Creates an instance of L2CAP bluetooth socket.
+        """
+        self.client_socket = bluetooth.BluetoothSocket(bluetooth.L2CAP)
 
     def discover_devices(self):
         """
@@ -137,9 +141,14 @@ class BlueToothClient(object):
         """
         print "Connecting to a device with \
 address %s on port %s ..." % (bt_address, PORT)
-        self.client_socket.connect((bt_address, PORT))
-        LOG.debug('Connected to a device with \
+        try:
+            self.client_socket.connect((bt_address, PORT))
+            LOG.debug('Connected to a device with \
 address %s on port %s.' % (bt_address, PORT))
+            return True
+        except bluetooth.btcommon.BluetoothError as exc:
+            print "Connection failed: %s." % exc
+            LOG.error('Failed to connect, reason:' % exc)
 
     def close_connection(self):
         """
@@ -240,20 +249,20 @@ class UserMenu(object):
 
                 bt_address_name = nearby_devices[int(raw_input("\nPlease input"
                                                    " target device number: "))]
-                self.BTClient.connect_to_device(bt_address_name[0])
-                self.show_command_menu()
-                self.process_command_menu_input(raw_input('\nPlease '
-                                                          'select option: '))
+                if self.BTClient.connect_to_device(bt_address_name[0]):
+                    self.show_command_menu()
+                    self.process_command_menu_input(raw_input('\nPlease '
+                                                            'select option: '))
             else:
                 print "No recently discovered nearby devices."
 
         elif user_input is "2":
             bt_address = raw_input("\nPlease input target device BT address: ")
             self.BTClient.check_address_validity(bt_address)
-            self.BTClient.connect_to_device(bt_address)
-            self.show_command_menu()
-            self.process_command_menu_input(raw_input('\nPlease '
-                                                            'select option: '))
+            if self.BTClient.connect_to_device(bt_address):
+                self.show_command_menu()
+                self.process_command_menu_input(raw_input('\nPlease '
+                                                          'select option: '))
 
     def process_main_menu_input(self, user_input):
         """
@@ -279,10 +288,11 @@ class UserMenu(object):
         """
         LOG.info('Haptics Feedback Client application started.')
         while True:
+            self.BTClient.create_bt_socket()  # socket can be used only once
             self.show_main_menu()
             self.process_main_menu_input(raw_input('\nPlease select option: '))
 
 
 if __name__ == '__main__':
-    Menu = UserMenu()
-    Menu.start()
+    Client = UserMenu()
+    Client.start()
