@@ -74,7 +74,7 @@ class BlueToothServer(object):
 
             print "Waiting for incoming BT L2CAP connections..."
             self.server_socket.bind(("", self.port))
-            self.server_socket.listen(1000)
+            self.server_socket.listen(1)
             client_socket, address = self.server_socket.accept()
             print "Accepted connection from a device with address: ", address
 
