@@ -100,14 +100,12 @@ class BlueToothClient(object):
         Checks if given string address valid or not.
         """
         if bluetooth.is_valid_address(address):
-            print "Address %s is valid." % address
+            print "Address '%s' is valid." % address
             LOG.debug("Checking address. Address %s is valid." % address)
             return True
         else:
-            print "Address %s is not valid." % address
+            print "Address '%s' is not valid." % address
             LOG.warning("Checking address. Address %s is NOT valid." % address)
-            #TODO: Write own exception here
-            raise Exception("Bad address")
 
     def find_bt_services(self, name=None, uuid=None, address=None):
         """
@@ -116,7 +114,10 @@ class BlueToothClient(object):
         """
         print "\nLooking for BlueTooth services...\n"
         if address:
-            self.check_address_validity(address)
+            if not self.check_address_validity(address):
+                # should not try to connect if address is not valid
+                print "\nExiting..."
+                sys.exit(0)
 
         self.bt_services = bluetooth.find_service(name, uuid, address)
 
@@ -258,17 +259,18 @@ class UserMenu(object):
 
         elif user_input is "2":
             bt_address = raw_input("\nPlease input target device BT address: ")
-            self.BTClient.check_address_validity(bt_address)
-            if self.BTClient.connect_to_device(bt_address):
-                self.show_command_menu()
-                self.process_command_menu_input(raw_input('\nPlease '
-                                                          'select option: '))
+            if self.BTClient.check_address_validity(bt_address):
+                if self.BTClient.connect_to_device(bt_address):
+                    self.show_command_menu()
+                    self.process_command_menu_input(raw_input('\nPlease '
+                                                            'select option: '))
 
     def process_main_menu_input(self, user_input):
         """
         Processes given user choices in the main menu.
         """
         if user_input is "0":
+            LOG.info('Haptics Feedback client application closed.')
             sys.exit(0)
 
         elif user_input is "1":
