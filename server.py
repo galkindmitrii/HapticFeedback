@@ -1,4 +1,19 @@
 """
+A simple server application for a research on Haptics Feedback.
+Uses Logical link control and adaptation (L2CAP) Bluetooth protocol.
+
+Features:
+- Accepts L2CAP connections and processes received data.
+- If received data is a vibration code: vibrates with the device accordingly.
+- Else displays the data.
+
+Requirements:
+- Android 2.2+ (Tested on 2.3.5)
+- SL4A_r6 (http://code.google.com/p/android-scripting/)
+- Python for Android 2.6+ (Availiable for dovnload:
+  http://code.google.com/p/android-scripting/downloads/list)
+- PyBluez (ARM version 0.19 can be found via link:
+  http://code.google.com/p/python-for-android/downloads/list)
 """
 import time
 import logging
