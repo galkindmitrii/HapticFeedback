@@ -76,13 +76,29 @@ class VibratingPhone(object):
 
     def vibrate(self, data):
         if data == '16fd2706':
+            self.Droid.dialogCreateAlert('Message received',
+                                         'Vibrating pattern one')
+            self.Droid.dialogShow()
             self.pattern_one()
+
         elif data == '6fa459ea':
+            self.Droid.dialogCreateAlert('Message received',
+                                         'Vibrating pattern two')
+            self.Droid.dialogShow()
             self.pattern_two()
+
         elif data == 'a8098c1a':
+            self.Droid.dialogCreateAlert('Message received',
+                                         'Vibrating pattern three')
+            self.Droid.dialogShow()
             self.pattern_three()
+
         elif data == '886313e1':
+            self.Droid.dialogCreateAlert('Message received',
+                                         'Vibrating pattern four')
+            self.Droid.dialogShow()
             self.pattern_four()
+
         else:
             LOG.debug('No interpretation available for code %s' % data)
             print "\nNon interpretable vibration code..."
