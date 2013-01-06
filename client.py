@@ -5,7 +5,7 @@ Uses Logical link control and adaptation (L2CAP) Bluetooth protocol.
 Features:
 - Search for near Bluetooth devices and their capabilities.
 - Connect to a discovered device or to a device by provided address.
-- Send text or a vibration code to remote device.
+- Send text or a vibration code to a remote device.
 
 Requirements:
 - PyBluez (http://code.google.com/p/pybluez/)
