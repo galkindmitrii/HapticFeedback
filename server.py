@@ -10,7 +10,7 @@ Features:
 Requirements:
 - Android 2.2+ (Tested on 2.3.5)
 - SL4A_r6 (http://code.google.com/p/android-scripting/)
-- Python for Android 2.6+ (Availiable for dovnload:
+- Python for Android 2.6+ (Availiable for download:
   http://code.google.com/p/android-scripting/downloads/list)
 - PyBluez (ARM version 0.19 can be found via link:
   http://code.google.com/p/python-for-android/downloads/list)
@@ -59,20 +59,25 @@ class VibratingPhone(object):
         self.Droid = android.Android()
 
     def pattern_one(self):
-        self.Droid.vibrate(1000)
+        self.Droid.vibrate(1200)
 
     def pattern_two(self):
-        self.Droid.vibrate(1000)
-        time.sleep(2)
-        self.Droid.vibrate(1000)
+        self.Droid.vibrate(700)
+        time.sleep(1.2)
+        self.Droid.vibrate(700)
 
     def pattern_three(self):
-        self.Droid.vibrate(300)
-        time.sleep(2)
-        self.Droid.vibrate(300)
+        self.Droid.vibrate(250)
+        time.sleep(0.4)
+        self.Droid.vibrate(250)
+        time.sleep(0.4)
+        self.Droid.vibrate(250)
 
     def pattern_four(self):
-        self.Droid.vibrate(100)
+        for vibration in range(12):
+            self.Droid.vibrate(100)
+            time.sleep(0.1)
+            vibration += 1
 
     def vibrate(self, data):
         if data == '16fd2706':
@@ -140,7 +145,7 @@ class BlueToothServer(object):
         """
         self.server_socket.bind(("", PORT))
 
-        # This setting ensures that data from one connection will be received:
+        # this setting ensures that data from one connection will be received
         self.server_socket.listen(1)
 
         client_socket, address = self.server_socket.accept()
