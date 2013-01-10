@@ -14,6 +14,7 @@ import os
 import sys
 import logging
 import ConfigParser
+from pprint import pprint
 
 import bluetooth
 
@@ -255,8 +256,8 @@ class UserMenu(object):
             nearby_devices = self.BTClient.nearby_devices_to_dict()
             if nearby_devices:
                 print "\nRecently discovered BT devices:"
-                print "- Number ------ (Address, Name) -"
-                print nearby_devices
+                print "- Num ---- Address --------- Name -"
+                pprint(nearby_devices)
 
                 bt_address_name = nearby_devices[int(raw_input("\nPlease input"
                                                    " target device number: "))]
