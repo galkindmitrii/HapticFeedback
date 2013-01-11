@@ -12,6 +12,8 @@ Requirements:
 """
 import os
 import sys
+import time
+import random
 import logging
 import ConfigParser
 from pprint import pprint
@@ -33,6 +35,7 @@ try:
     DISCOVERY_DURATION = config.getint(config_section_name,
                                        'discovery_duration')
     FLUSH_CACHE = config.getboolean(config_section_name, 'flush_cache')
+    TRAINING_ATTEMPTS = config.getint(config_section_name, 'training_attempts')
     LOG_FILE = config.get(config_section_name, 'log_file')
 
 except ConfigParser.NoSectionError:
@@ -41,6 +44,7 @@ file '%s', using default settings." % (config_section_name, config_filename)
     PORT = 0x1001
     DISCOVERY_DURATION = 8
     FLUSH_CACHE = True
+    TRAINING_ATTEMPTS = 20
     LOG_FILE = 'client.log'
 
 LOG = logging
@@ -167,6 +171,9 @@ address %s on port %s.' % (bt_address, PORT))
         Closes client socket.
         """
         print "\nClosing connection..."
+        # workaround with time.sleep to enable
+        # full data aquisition by the receiver
+        time.sleep(0.2)
         self.client_socket.close()
         print "\nClosed."
         LOG.debug('Current connection was closed.')
@@ -186,6 +193,7 @@ class UserMenu(object):
     """
     def __init__(self):
         self.BTClient = BlueToothClient()
+        self.correct_answers = []
 
     def show_main_menu(self):
         """
@@ -204,6 +212,7 @@ class UserMenu(object):
         print "\n-------- BlueTooth Connection Menu --------"
         print " (1) Connect to one of the recently discovered device"
         print " (2) Connect to a device with specified BT address"
+        print " (3) Start training with a recently discovered device"
         print " (0) Back to the main menu"
 
     def show_command_menu(self):
@@ -217,6 +226,13 @@ class UserMenu(object):
         print " (4) Send vibration pattern four"
         print " (5) Send text data"
         print " (0) Close connection and back to main menu"
+
+    def check_user_test_answer(self, answer, correct_answer):
+        """
+        Appends correct user guesses to a list to count percentage.
+        """
+        if answer == correct_answer:
+            self.correct_answers.append(answer)
 
     def process_command_menu_input(self, user_input):
         """
@@ -258,13 +274,15 @@ class UserMenu(object):
                 print "\nRecently discovered BT devices:"
                 print "- Num ---- Address --------- Name -"
                 pprint(nearby_devices)
-
-                bt_address_name = nearby_devices[int(raw_input("\nPlease input"
-                                                   " target device number: "))]
-                if self.BTClient.connect_to_device(bt_address_name[0]):
-                    self.show_command_menu()
-                    self.process_command_menu_input(raw_input('\nPlease '
+                try:
+                    bt_address_name = nearby_devices[int(raw_input(
+                                     "\nPlease input target device number: "))]
+                    if self.BTClient.connect_to_device(bt_address_name[0]):
+                        self.show_command_menu()
+                        self.process_command_menu_input(raw_input('\nPlease '
                                                             'select option: '))
+                except (KeyError, ValueError):
+                    print "\nWrong device number."
             else:
                 print "No recently discovered nearby devices."
 
@@ -275,6 +293,38 @@ class UserMenu(object):
                     self.show_command_menu()
                     self.process_command_menu_input(raw_input('\nPlease '
                                                             'select option: '))
+
+        elif user_input is "3":
+            print "\nPlease select the target device"
+            nearby_devices = self.BTClient.nearby_devices_to_dict()
+            if nearby_devices:
+                print "\nRecently discovered BT devices:"
+                print "- Num ---- Address --------- Name -"
+                pprint(nearby_devices)
+                try:
+                    bt_address_name = nearby_devices[int(raw_input(
+                                     "\nPlease input target device number: "))]
+                    print "\nStarting training:"
+
+                    for train_attempt in range(TRAINING_ATTEMPTS):
+                        if self.BTClient.connect_to_device(bt_address_name[0]):
+                            print "\nAttempt No.", train_attempt + 1
+                            random_pattern = str(random.randint(1, 4))
+                            self.process_command_menu_input(random_pattern)
+                            self.check_user_test_answer(raw_input(
+                                                   "\nEnter pattern number: "),
+                                                   random_pattern)
+                            train_attempt += 1
+
+                        self.BTClient.create_bt_socket()
+
+                    print "\nCorrect answers: %s percent." % (float(
+                          len(self.correct_answers)) / TRAINING_ATTEMPTS * 100)
+                    self.correct_answers = []
+                except (KeyError, ValueError):
+                    print "\nWrong device number."
+            else:
+                print "No recently discovered nearby devices."
 
     def process_main_menu_input(self, user_input):
         """
