@@ -59,19 +59,19 @@ class VibratingPhone(object):
         self.Droid = android.Android()
 
     def pattern_one(self):
-        self.Droid.vibrate(1200)
+        self.Droid.vibrate(1400)
 
     def pattern_two(self):
         self.Droid.vibrate(700)
-        time.sleep(1.2)
+        time.sleep(1.4)
         self.Droid.vibrate(700)
 
     def pattern_three(self):
-        self.Droid.vibrate(250)
+        self.Droid.vibrate(200)
         time.sleep(0.4)
-        self.Droid.vibrate(250)
+        self.Droid.vibrate(200)
         time.sleep(0.4)
-        self.Droid.vibrate(250)
+        self.Droid.vibrate(200)
 
     def pattern_four(self):
         for vibration in range(12):
