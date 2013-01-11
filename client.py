@@ -75,7 +75,6 @@ class BlueToothClient(object):
         devices undetection.
         """
         print "\nDiscovering all nearby BlueTooth devices...\n"
-        self.nearby_devices = None
         self.nearby_devices = bluetooth.discover_devices(
                                                    duration=DISCOVERY_DURATION,
                                                    flush_cache=FLUSH_CACHE,
@@ -87,18 +86,19 @@ class BlueToothClient(object):
 
     def nearby_devices_to_dict(self):
         """
-        Returns discovered BT devices as a dictionary:
+        Prints and returns discovered BT devices as a dictionary:
         {Number_of_device: (address, name),}
         """
-        if self.nearby_devices:
-            nearby_devices_dict = {}
-            number = 1
-            for device in self.nearby_devices:
-                nearby_devices_dict[number] = device
-                number += 1
-            return nearby_devices_dict
-        else:
-            return None
+        nearby_devices_dict = {}
+        number = 1
+        for device in self.nearby_devices:
+            nearby_devices_dict[number] = device
+            number += 1
+
+        print "\nRecently discovered BT devices:"
+        print "- Num ---- Address --------- Name -"
+        pprint(nearby_devices_dict)
+        return nearby_devices_dict
 
     def show_devices(self):
         """
@@ -269,14 +269,10 @@ class UserMenu(object):
             pass
 
         elif user_input is "1":
-            nearby_devices = self.BTClient.nearby_devices_to_dict()
-            if nearby_devices:
-                print "\nRecently discovered BT devices:"
-                print "- Num ---- Address --------- Name -"
-                pprint(nearby_devices)
+            if self.BTClient.nearby_devices:
                 try:
-                    bt_address_name = nearby_devices[int(raw_input(
-                                     "\nPlease input target device number: "))]
+                    bt_address_name = self.BTClient.nearby_devices_to_dict()\
+                      [int(raw_input("\nPlease input target device number: "))]
                     if self.BTClient.connect_to_device(bt_address_name[0]):
                         self.show_command_menu()
                         self.process_command_menu_input(raw_input('\nPlease '
@@ -295,17 +291,12 @@ class UserMenu(object):
                                                             'select option: '))
 
         elif user_input is "3":
-            print "\nPlease select the target device"
-            nearby_devices = self.BTClient.nearby_devices_to_dict()
-            if nearby_devices:
-                print "\nRecently discovered BT devices:"
-                print "- Num ---- Address --------- Name -"
-                pprint(nearby_devices)
+            if self.BTClient.nearby_devices:
                 try:
-                    bt_address_name = nearby_devices[int(raw_input(
-                                     "\nPlease input target device number: "))]
-                    print "\nStarting training:"
+                    bt_address_name = self.BTClient.nearby_devices_to_dict()\
+                      [int(raw_input("\nPlease input target device number: "))]
 
+                    print "\nStarting training:"
                     for train_attempt in range(TRAINING_ATTEMPTS):
                         if self.BTClient.connect_to_device(bt_address_name[0]):
                             print "\nAttempt No.", train_attempt + 1
