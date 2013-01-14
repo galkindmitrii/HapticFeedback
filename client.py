@@ -6,6 +6,7 @@ Features:
 - Search for near Bluetooth devices and their capabilities.
 - Connect to a discovered device or to a device by provided address.
 - Send text or a vibration code to a remote device.
+- Training mode which shows final percentage of correct answers.
 
 Requirements:
 - PyBluez (http://code.google.com/p/pybluez/)
