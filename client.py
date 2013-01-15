@@ -235,6 +235,31 @@ class UserMenu(object):
         if answer == correct_answer:
             self.correct_answers.append(answer)
 
+    def start_testing_mode(self):
+        """
+        Sends random vibration and asks user to identify it.
+        Shows percentage of correct guesses when finished.
+        """
+        bt_address_name = self.BTClient.nearby_devices_to_dict()\
+          [int(raw_input("\nPlease input target device number: "))]
+
+        print "\nStarting test:"
+        for train_attempt in range(TRAINING_ATTEMPTS):
+            if self.BTClient.connect_to_device(bt_address_name[0]):
+                print "\nAttempt No.", train_attempt + 1
+                random_pattern = str(random.randint(1, 4))
+                self.process_command_menu_input(random_pattern)
+                self.check_user_test_answer(raw_input(
+                                       "\nEnter pattern number: "),
+                                       random_pattern)
+                train_attempt += 1
+
+            self.BTClient.create_bt_socket()
+
+        print "\nCorrect answers: %s percent." % (float(
+              len(self.correct_answers)) / TRAINING_ATTEMPTS * 100)
+        self.correct_answers = []
+
     def process_command_menu_input(self, user_input):
         """
         Processes given user commands for data transfer/vibrating patterns.
@@ -294,25 +319,7 @@ class UserMenu(object):
         elif user_input is "3":
             if self.BTClient.nearby_devices:
                 try:
-                    bt_address_name = self.BTClient.nearby_devices_to_dict()\
-                      [int(raw_input("\nPlease input target device number: "))]
-
-                    print "\nStarting training:"
-                    for train_attempt in range(TRAINING_ATTEMPTS):
-                        if self.BTClient.connect_to_device(bt_address_name[0]):
-                            print "\nAttempt No.", train_attempt + 1
-                            random_pattern = str(random.randint(1, 4))
-                            self.process_command_menu_input(random_pattern)
-                            self.check_user_test_answer(raw_input(
-                                                   "\nEnter pattern number: "),
-                                                   random_pattern)
-                            train_attempt += 1
-
-                        self.BTClient.create_bt_socket()
-
-                    print "\nCorrect answers: %s percent." % (float(
-                          len(self.correct_answers)) / TRAINING_ATTEMPTS * 100)
-                    self.correct_answers = []
+                    self.start_testing_mode()
                 except (KeyError, ValueError):
                     print "\nWrong device number."
             else:
