@@ -135,7 +135,7 @@ class BlueToothServer(object):
     def bind_and_receive_data(self):
         """
         Binds to server socket, accepts connection and
-        returns received first 1024 bytes of data.
+        returns received first 64 bytes of data.
 
         Data will be received only from connection that
         was activated first, other data is ignored.
@@ -155,7 +155,7 @@ class BlueToothServer(object):
 
         data = None
         try:
-            data = client_socket.recv(1024)
+            data = client_socket.recv(64)
             print "\nFinished receiving data."
         except bluetooth.btcommon.BluetoothError as exc:
             # if error occures - ignoring and closing sockets
