@@ -166,6 +166,9 @@ address %s on port %s.' % (bt_address, PORT))
         except bluetooth.btcommon.BluetoothError as exc:
             print "Connection failed: %s." % exc
             LOG.error('Failed to connect, reason:' % exc)
+            print "\nWaiting for 5 seconds..."
+            # helps if connection was refused due to server being busy
+            time.sleep(5)
 
     def close_connection(self):
         """
