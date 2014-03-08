@@ -18,3 +18,6 @@ Client features:
 - Connect to a discovered device or to a device by provided address.
 - Send text or a vibration code to connected remote device.
 - Training mode which shows final percentage of correct answers.
+
+For more infomation regarding the application and experiment conducted,
+check the Haptics Feedback Research.pdf
